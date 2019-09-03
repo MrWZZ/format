@@ -27,11 +27,8 @@ function DoFormat() {
     
     //处理段落类型
     content = MatchParagraph(content);
-    //加粗需要在段落后处理
-    content = MatchBold(content);
-
+    content = content.replace(/\n/g,"");
     element.innerHTML = content;
-    element.style.display="block";
 
     setTimeout(DoFormat,10);
 }
@@ -128,13 +125,3 @@ function ParagraphHandler(str) {
     return `<p>${str}</p>`;
 }
 
-//替换加粗类型
-function MatchBold(content) {
-    return content.replace(/\*[^\n]+\*(?=[^\n]+<\/p>)/gm,BoldHandler)
-}
-
-function BoldHandler(str) {
-    str = str.replace(/\*+\s*|\s*\*+/g,"");
-    str = `<b>${str}</b>`;
-    return str;
-}
