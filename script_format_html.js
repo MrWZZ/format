@@ -2,7 +2,7 @@
 var curIndentMultiple = 0;
 var curLineNum = 0;
 //代码风格转换
-function ScriptTypeHandler(line) {
+function HtmlScriptTypeHandler(line) {
     
     curLineNum = ++curLineNum % 2;
     //空行直接返回
@@ -63,8 +63,8 @@ var htmlCssType = {
 
 if(window.scriptType === null || window.scriptType === undefined) {
     window.scriptType = {
-        html : ScriptTypeHandler
+        html : HtmlScriptTypeHandler
     }
 } else {
-    window.scriptType.html = ScriptTypeHandler
+    window.scriptType.html = HtmlScriptTypeHandler
 }

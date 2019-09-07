@@ -2,7 +2,7 @@
 var curIndentMultiple = 0;
 var curLineNum = 0;
 //代码风格转换
-function ScriptTypeHandler(line) {
+function CsharpScriptTypeHandler(line) {
     
     curLineNum = ++curLineNum % 2;
     //空行直接返回
@@ -44,8 +44,8 @@ var csharpsCssType = {
 
 if(window.scriptType === null || window.scriptType === undefined) {
     window.scriptType = {
-        csharp : ScriptTypeHandler,
+        csharp : CsharpScriptTypeHandler,
     }
 } else {
-    window.scriptType.csharp = ScriptTypeHandler
+    window.scriptType.csharp = CsharpScriptTypeHandler
 }
