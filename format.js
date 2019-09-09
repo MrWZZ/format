@@ -40,19 +40,14 @@ function Trim(content) {
 
 //替换标题类型
 function MatchTitle(content) {
-    return content.replace(/^#+[^#]+#+$/gm,TitleHandler);
+    return content.replace(/^#+[^#]+?#\/+$/gm,TitleHandler);
 }
 
 function TitleHandler(str) {
-    //对比开始和结尾#号是数量，相等才认为是一个标题
-    var list = str.match(/#+/g);
-    if(list[0] == null || list[1] == null || list[0].length != list[1].length) {
-        return str;
-    } 
+    //标题类型
+    var type = str;
     //获取标题名字
     str = str.replace(/^#+\s+|\s+#+$/g,"");
-    //根据#号长度设置标题类型
-    var type = list[0].length;
     str = `<h${type}>${str}</h${type}>`
     return str;
 }

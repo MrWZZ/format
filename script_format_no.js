@@ -32,14 +32,14 @@ function DefaultScriptTypeHandler(scriptContent) {
         return `<div class="script_line script_line_${curLineNum}">${indentStr}${line}</div>`;
     });
 
-    return `<div class="script_default script_content">${scriptContent}</div>`;
+    return `<div class="script_no script_content">${scriptContent}</div>`;
 } 
 
 if(window.scriptType === null || window.scriptType === undefined) {
     window.scriptType = {
-        default : DefaultScriptTypeHandler
+        no : DefaultScriptTypeHandler
     }
 } else {
-    window.scriptType.default = DefaultScriptTypeHandler
+    window.scriptType.no = DefaultScriptTypeHandler
 }
 

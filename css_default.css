@@ -57,6 +57,10 @@ var, video {
     background: #f5f5f5;
 }
 
+.script_inline {
+    background: #ff9c9c;
+}
+
 .p {
     text-indent: 2em;
 }
