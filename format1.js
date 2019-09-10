@@ -50,6 +50,9 @@ function Do(str) {
     //console.log(`${lineNum}==|${str}`);
 
     switch(str.substring(0,1)) {
+        case "!":
+            change = NoHandler(str);
+            break;
         case "#":
             change = TitleHandler(str);
             break;
@@ -70,6 +73,16 @@ function Do(str) {
     //console.log(`${lineNum}--|${change}`);
     lineNum++;
     return change;
+}
+
+function NoHandler(str) {
+    var oldLength = str.length;
+    var match = "!/\n";
+    var find = contentHTML.indexOf( match, start );
+    str = contentHTML.substring(start ,find + match.length);
+    start += str.length - oldLength;
+
+    return str.replace(/!\n|!\/\n/g,"");
 }
 
 function TitleHandler(str) {
