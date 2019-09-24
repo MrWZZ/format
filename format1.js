@@ -23,7 +23,6 @@ function AddList() {
     contentHTML = contentHTML.replace(/^[ \t]+|[ \t]+?(?=\n)/gm,"");
     //删除第一个换行
     contentHTML = contentHTML.replace(/\n/,"");
-    var t1 = new Date().getTime();
     //替换连接类型
     contentHTML = contentHTML.replace(/\s*?\+\n/g,"");
     //填写的文本
@@ -38,8 +37,6 @@ function AddList() {
         start += line.length;
     }
 
-    var t2 = new Date().getTime();
-    console.log("时间:"+(t2-t1));
     return format;
 }
 
@@ -119,7 +116,7 @@ function ScriptHandler(str) {
     str = contentHTML.substring(start ,find + match.length);
     start += str.length - oldLength;
     //获取代码声明的类型
-    var type = str.match(/`{3}\S*/);
+    var type = str.match(/`{3}\S*/)[0].replace("```","");
     //删除代码声明标识
     str = str.replace(/`{3}\S*\n|`{3}\/\n/g,"");
     //给代码中的每一行加上代码段标识
@@ -156,7 +153,6 @@ function ALink(str) {
     return `<a href="${ahref}">${aContent}</a>`
 }
 
-//<img src="/i/eg_tulip.jpg"  alt="上海鲜花港 - 郁金香" />
 function ILink(str) {
     var endIndex = str.indexOf("]");
     //[i-x x位置之后为地址

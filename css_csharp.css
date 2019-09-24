@@ -1,3 +1,11 @@
-.csharp_key {
+.cs_key {
     color: blue
+}
+
+.cs_string {
+    color: #ff5722
+}
+
+.cs_class {
+    color: green;
 }

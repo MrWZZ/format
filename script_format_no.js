@@ -4,6 +4,8 @@ function DefaultScriptTypeHandler(scriptContent) {
     var curIndentMultiple = 0;
     //代码风格转换
     var curLineNum = 0;
+    scriptContent = scriptContent.replace("<","&lt;")
+    scriptContent = scriptContent.replace(">","&gt;")
 
     scriptContent = scriptContent.replace(/[\s\S]*?\n/g,function(line) {
         curLineNum = ++curLineNum % 2;
