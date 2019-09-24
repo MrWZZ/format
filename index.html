@@ -58,7 +58,7 @@
 
     * 3.弓箭 */
     + 葛平
-    ++ 尝试
+    ++   尝试
     ++ * 空间 */
     ++ * 实例 */
         [a-www.baidu.com](百度)
@@ -92,15 +92,8 @@
             厉害了
 
             ```cs
-                public List<NetEntry> netEntries = new List<NetEntry>();
-                public NetEntry StartNet(CGameNetShort net, bool checkConnective)
-                {
-                    // 新建一个，然后删除旧的，但列表里的net毛事没有释放
-                    NetEntry rtn = new NetEntry() { net = net, checkConnective = checkConnective };
-                    netEntries.RemoveAll(p => p.net == net);
-                    netEntries.Add(rtn);
-                    return rtn;
-                }
+                
+
             ```/
         ### 标题4 ###        
 

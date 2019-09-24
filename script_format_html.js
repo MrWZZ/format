@@ -99,19 +99,19 @@ function DoHtmlTags(str) {
 
 function HtmlKeysBegin(str) {
     str = str.replace(/&lt;/,"");
-    return `&lt;<span class=${HtmlCssType.key}>${str}</span>`;
+    return `&lt;<span class="${HtmlCssType.key}">${str}</span>`;
 }
 
 function HtmlKeysEnd(str) {
     str = str.replace(/&lt;\//,"");
-    return `&lt;/<span class=${HtmlCssType.key}>${str}</span>`;
+    return `&lt;/<span class="${HtmlCssType.key}">${str}</span>`;
 }
 
 function HtmlAttribute(str) {
     var arr = str.split("=");
     var keyName = arr[0];
     var keyValue = arr[1];
-    return `<span class=${HtmlCssType.attribute}>${keyName}</span>=<span class=${HtmlCssType.string}>${keyValue}</span>`;
+    return `<span class="${HtmlCssType.attribute}">${keyName}</span>=<span class=${HtmlCssType.string}>${keyValue}</span>`;
 }
 
 var HtmlCssType = {

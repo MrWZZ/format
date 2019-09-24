@@ -1,7 +1,15 @@
+//上一个单词
+var beforeWord = "";
+//是否是注释
+var isComment = false;
+//当前行
+var curLineContent = "";
 
 //代码风格转换
 function CsharpScriptTypeHandler(scriptContent) {
     
+    //前面是否出现了case要缩进
+    var caseIndentNum = 0;
     //当前缩进倍数
     var curIndentMultiple = 0;
     //代码风格转换
@@ -20,8 +28,14 @@ function CsharpScriptTypeHandler(scriptContent) {
         if(isStart) {
             curIndentMultiple = curIndentMultiple > 0 ? curIndentMultiple - 1 : 0;
         }
+        if(/^(case )/.test(line)){
+            caseIndentNum--;
+            if(caseIndentNum<0) {
+                caseIndentNum = 0;
+            }
+        }
 
-        var indentLength = curIndentMultiple * formatConfig.perIndentNum;
+        var indentLength = (curIndentMultiple + caseIndentNum) * formatConfig.perIndentNum;
         var indentStr = "";
         for(var i=0;i<indentLength;i++) {
             indentStr += formatConfig.indent;
@@ -32,13 +46,20 @@ function CsharpScriptTypeHandler(scriptContent) {
         if(isEnd) {
             curIndentMultiple++;
         }
+        if(/^(case )/.test(line)){
+            caseIndentNum++;
+        }
 
-        //识别关键字
-        line = line.replace(/[^\s.=(){};&]+/g,CsharpKeys);
-        //识别字符串
-        line = line.replace(/"[\s\S]+?"/g,CsharpStrings);
-        //识别类
-        line = line.replace(/"[\s\S]+?"/g,CsharpClass);
+        beforeWord = "";
+        isComment = false;
+        line = line.replace(/[^\s.=(){};:&#\[\]]+/g,CsharpLineGroup);
+
+        // //识别关键字
+        // line = line.replace(/[^\s.=(){};&]+/g,CsharpKeys);
+        // //识别字符串
+        // line = line.replace(/"[\s\S]+?"/g,CsharpStrings);
+        // //识别类
+        // line = line.replace(/"[\s\S]+?"/g,CsharpClass);
 
         return `<div class="script_line script_line_${curLineNum}">${indentStr}${line}</div>`;
     });
@@ -46,66 +67,147 @@ function CsharpScriptTypeHandler(scriptContent) {
     return `<div class="script_cs script_content">${scriptContent}</div>`;
 } 
 
-var csharpTagsStart = 0;
-var csharpTagsEnd = 0;
-var csharpFormat = "";
-function CsharpLine(str) { 
-    csharpTagsStart = 0;
-    csharpTagsEnd = 0;
-    csharpFormat = "";
-    var isEnd = false;
-    while(true) {
-        //匹配空格
-        csharpTagsEnd = str.indexOf(" ",csharpTagsStart);
-        //匹配末尾
-        if(csharpTagsEnd < 0 ) {
-            isEnd = true;
-            csharpTagsEnd = str.indexOf("&gt;",csharpTagsStart);
-        }
+//对一行中的每个单词做处理
+function CsharpLineGroup(match,index,origion) {
+    if(isComment) {
+        //如果是注释，前面处理过了
+        return "";
+    }
+    //如果是注释
+    if(match.substr(0,2)=="//") {
+        isComment = true;
+        return  CsharpComment(origion.substr(index,origion.length-1));
+    }
 
-        if(csharpTagsEnd < 0) {
+    var doMatchStr = "";
+    var beginTag = "";
+    var endTag = "";
+    //识别一个单词的前面是什么
+    if(index<=0) {
+        beginTag = "";
+    }
+    else {
+        beginTag = origion.substr(index-1,1);
+    }
+
+    //识别一个单词末尾是什么
+    if(index + match.length >= origion.length) {
+        endTag = "";
+    }
+    else {
+        endTag = origion.substr(index + match.length,1);
+    }
+
+     if(csKeys[match]) {
+        //识别是不是关键字
+        return `<span class="${csharpsCssType.key}">${match}</span>`;
+    }
+
+    switch(beginTag) {
+        case "":
+            switch(endTag) {
+                case "(":
+                    //方法
+                    doMatchStr = CsharpFuntion(match);
+                    break;
+                default:
+                    doMatchStr = CsharpDefault(match,index,origion);
+                    break;
+            }
             break;
-        }
-        //这里不把空格传入
-        var group = str.substring(csharpTagsStart,csharpTagsEnd);
-        
-        csharpFormat += DoCsharpGroup(group);
-        //这里补充空格的位置
-        if(!isEnd) {
-            htmlFormat += " ";
-        }
-        
-        htmlTagsStart += (group.length + 1);
+        case " ":
+            switch(endTag) {
+                case "(":
+                    //方法
+                    doMatchStr = CsharpFuntion(match);
+                    break;
+                case "&":
+                case "[":
+                    doMatchStr = CsharpClass(match);
+                    break;
+                default:
+                    doMatchStr = CsharpDefault(match,index,origion);
+                    break;
+            }
+            break;
+        case ";":
+            switch(endTag) {
+                case "&":
+                case "[":
+                    doMatchStr = CsharpClass(match);
+                    break;
+                default:
+                    doMatchStr = CsharpDefault(match,index,origion);
+                    break;
+            }
+            break;
+        case ".":
+            switch(endTag) {
+                case "(":
+                    doMatchStr = CsharpFuntion(match);
+                    break;
+                default:
+                    doMatchStr = CsharpDefault(match,index,origion);
+                    break;
+            }
+            break;
+        default:
+            doMatchStr = CsharpDefault(match,index,origion);
+            break;
     }
 
-    //补充结尾尖括号
-    htmlFormat += "&gt;"
-    return htmlFormat;
+    beforeWord = match;
+    return doMatchStr;
 }
 
-function DoCsharpGroup() {
-
-}
-
-function CsharpKeys(str) { 
-    if(csKeys[str]) {
-        return `<span class=${csharpsCssType.key}>${str}</span>`
+function CsharpDefault(str,index,origion) {
+    if(str == "lt" || str == "gt") {
+        return str;
     }
-    return str;
+
+    switch(beforeWord) {
+        case "public":
+        case "private":
+        case "protected":
+        case "namespace":
+            return CsharpClass(str);
+        default:
+            var nextContent = origion.substr(index,origion.length-1);
+            if(/^[a-zA-Z0-9]+\s+[a-zA-Z0-9]+/.test(nextContent)) {
+                return CsharpClass(str);
+            } 
+            return str;
+    }
+}
+
+function CsharpFuntion(str) {
+    if(beforeWord != "new") {
+        return `<span class="${csharpsCssType.function}">${str}</span>`
+    }
+    else {
+        return CsharpClass(str);
+    }
+}
+
+function CsharpComment(str) {
+    return `<span class="${csharpsCssType.comment}">${str}</span>`
 }
 
 function CsharpStrings(str) {
-    return `<span class=${csharpsCssType.string}>${str}</span>`
+    return `<span class="${csharpsCssType.string}">${str}</span>`
 }
 
 function CsharpClass(str) {
-    return `<span class=${csharpsCssType.class}>${str}</span>`
+    return `<span class="${csharpsCssType.class}">${str}</span>`
 }
 
 var csharpsCssType = {
     key : "cs_key",
     string : "cs_string",
     class : "cs_class",
+    error : "cs_error",
+    function : "cs_function",
+    comment : "cs_comment",
 }
 
 if(window.scriptType === null || window.scriptType === undefined) {
@@ -125,6 +227,7 @@ break: 1,
 byte: 1,
 case: 1,
 catch: 1,
+class : 1,
 char: 1,
 checked: 1,
 const: 1,
@@ -137,6 +240,7 @@ double: 1,
 enum: 1,
 event: 1,
 explicit: 1,
+else : 1,
 extern: 1,
 finally: 1,
 fixed: 1,
@@ -154,6 +258,7 @@ is: 1,
 lock: 1,
 long: 1,
 new : 1,
+namespace:1,
 object: 1,
 operator: 1,
 out: 1,

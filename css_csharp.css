@@ -7,5 +7,19 @@
 }
 
 .cs_class {
-    color: green;
+    color: #2dafa3;
+}
+
+.cs_error {
+    border-bottom-color: red;
+    border-bottom-style: dashed;
+    border-bottom-width: 1px;
+}
+
+.cs_function {
+    color: #e4ba19;
+}
+
+.cs_comment {
+    color: #00b308;
 }
